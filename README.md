@@ -13,12 +13,6 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
-### `yarn cypress:open`
-Runs the cypress tests in browser, make sure to run the server before running the tests.
-
-### `yarn prettify`
-Runs prettier for the src folder
-
 ### `yarn start`
 
 Runs the app in the development mode.\
@@ -34,6 +28,14 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
+
+### `yarn cypress:open`
+Runs the cypress tests in browser, make sure to run the server before running the tests.
+
+### `yarn prettify`
+Runs prettier for the src folder
+
+
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
