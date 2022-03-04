@@ -13,7 +13,6 @@ import ModalFooter from '../Modal/ModalFooter';
 import Button from '../Button/Button';
 import { Offer, OffersResponse } from '../../types/offer';
 import Skeleton from '../Loader/Skeleton';
-
 interface ItemsModalProps {
   setShowModal: (val: boolean) => void;
 }
@@ -24,19 +23,31 @@ const StyledModalBodyHeader = styled.div`
 `;
 
 const ItemsModal: React.FC<ItemsModalProps> = ({ setShowModal }) => {
+
   const [offers, setOffers] = React.useState<Offer[]>([]);
   const [currency, setCurrency] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  // `selectedOffers` bych dal normalne jako Array. Nevidim duvod proc Set, stejne se vsude ten Set dava do Array
   const [selectedOffers, setSelectedOffers] = React.useState(new Set());
+  // Zbytecne, neni potreba to mit ve state. `selectedOffers` jsou ve state a to staci
   const [total, setTotal] = React.useState(0);
+
   async function fetchOffers() {
     setIsLoading(true);
+
+    // try/catch
+    // v pripade vice API callu bych to dal jak separe funkci, ktera bude mit try/catch,
+    // osetreny http 200 a vracela by uz primo json data
+
     const response = await fetch(
-      'https://private-803503-digismoothietest.apiary-mock.com/offers'
+      'https://private-803503-digismoothietest.apiary-mock.com/offers',
     );
+    // setIsLoading by se mel dat dolu. Pokud projde podminka response.ok tak se ceka na dalsi promise
     setIsLoading(false);
     if (response.ok) {
       const jsonResponse: OffersResponse = await response.json();
+      // Tohle bych dal do jednoho state objektu, kdyz uz je ten response i otypovany
+      // const [apiOffers, setApiOffers] = useState<OffersResponse>({ offers: [], currency: '' })
       setOffers(jsonResponse.offers);
       setCurrency(jsonResponse.currency);
     } else {
@@ -47,6 +58,8 @@ const ItemsModal: React.FC<ItemsModalProps> = ({ setShowModal }) => {
     fetchOffers();
   }, []);
 
+
+  // Zbytecny effekt. `total` bych dal normalne jako constantu.
   React.useEffect(() => {
     const offersArr = Array.from(selectedOffers).map((v) =>
       offers.find((i) => i.title === v)
@@ -59,7 +72,11 @@ const ItemsModal: React.FC<ItemsModalProps> = ({ setShowModal }) => {
       )
     );
   }, [selectedOffers, offers]);
+
+
+
   return (
+    // "toggler" bych ocekaval, ze bere boolean hodnotu a otevira/zavira modal. Tady by se spis hodilo neco jako "onClose"
     <Modal toggler={() => setShowModal(false)}>
       <ModalHeader toggler={() => setShowModal(false)}>
         Wait, don't miss our deals, today only!
@@ -128,6 +145,7 @@ const ItemsModal: React.FC<ItemsModalProps> = ({ setShowModal }) => {
               </div>
             );
           })}
+          {/* Chybi "emptyState", v pripade, ze nemam zadne offers */}
         </div>
       </ModalBody>
       <ModalFooter>
@@ -137,6 +155,7 @@ const ItemsModal: React.FC<ItemsModalProps> = ({ setShowModal }) => {
           disabled={!Array.from(selectedOffers).length}
           onClick={() => {
             setShowModal(false);
+            // V zadani je, vypsat ids ne titles. Ale to je hadam detail.
             alert(
               `Selected offers are ${Array.from(selectedOffers).join(',')}`
             );
