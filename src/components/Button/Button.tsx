@@ -1,78 +1,103 @@
-import React from 'react';
-import clsx from 'classnames';
+import React from 'react'
+import clsx from 'classnames'
 
-const filledBgColors: { [key: string]: string } = {
+type ButtonColor = {
+  [K in "green" | "indigo"]: string
+};
+
+const filledBgColors: ButtonColor = {
   green: 'bg-green-500',
   indigo: 'bg-indigo-500',
 };
 
-const filledBgHoverColors: { [key: string]: string } = {
+const filledBgHoverColors: ButtonColor = {
   green: 'hover:bg-green-700',
   indigo: 'hover:bg-indigo-700',
 };
 
-const filledBgFocusColors: { [key: string]: string } = {
+const filledBgFocusColors: ButtonColor = {
   green: 'focus:bg-green-400',
   indigo: 'focus:bg-indigo-400',
 };
 
-const filledBgActiveColors: { [key: string]: string } = {
+const filledBgActiveColors: ButtonColor = {
   green: 'active:bg-green-800',
   indigo: 'active:bg-indigo-800',
 };
 
-const filledShadowColors: { [key: string]: string } = {
+const filledShadowColors: ButtonColor = {
   green: 'shadow-md-green',
   indigo: 'shadow-md-indigo',
 };
 
-const filledShadowHoverColors: { [key: string]: string } = {
+const filledShadowHoverColors: ButtonColor = {
   green: 'hover:shadow-lg-green',
   indigo: 'hover:shadow-lg-indigo',
 };
 
-const outlineTextColors: { [key: string]: string } = {
+const outlineTextColors: ButtonColor = {
   green: 'text-black',
   indigo: 'text-indigo-500',
 };
 
-const outlineBorderColors: { [key: string]: string } = {
+const outlineBorderColors: ButtonColor = {
   green: 'border-green-500',
   indigo: 'border-indigo-500',
 };
 
-const outlineBgHoverColors: { [key: string]: string } = {
+const outlineBgHoverColors: ButtonColor = {
   green: 'hover:bg-green-50',
   indigo: 'hover:bg-indigo-50',
 };
 
-const outlineBorderHoverColors: { [key: string]: string } = {
+const outlineBorderHoverColors: ButtonColor = {
   green: 'hover:border-green-700',
   indigo: 'hover:border-indigo-700',
 };
 
-const outlineTextHoverColors: { [key: string]: string } = {
+const outlineTextHoverColors: ButtonColor = {
   green: 'hover:text-black',
   indigo: 'hover:text-indigo-700',
 };
 
-const outlineBgActiveColors: { [key: string]: string } = {
+const outlineBgActiveColors: ButtonColor = {
   green: 'active:bg-green-100',
   indigo: 'active:bg-indigo-100',
 };
 
-const Button: React.FC<{
+const initialClasses = 'flex items-center justify-center gap-1 font-bold outline-none tracking-wider focus:outline-none focus:shadow-none transition-all duration-300'
+
+const buttonSizes = {
+  sm: 'py-1.5 px-4 text-xs leading-normal',
+  lg: 'py-3 px-7 text-sm leading-relaxed',
+  regular: 'py-2.5 px-6 text-xs leading-normal'
+}
+
+
+interface IComponentProps {
   children: React.ReactNode;
-  color: string;
-  buttonType?: string;
-  size?: string;
+  color: keyof ButtonColor;
+  size?: 'sm' | 'lg' | 'regular';
+  buttonType?: 'solid' | 'outline';
   className?: string;
   disabled?: boolean;
   onClick: (e: React.SyntheticEvent) => void;
-}> = ({ children, color, buttonType, size, className, disabled, ...rest }) => {
-  let classes = [];
+}
 
-  const buttonFilled = [
+const defaultProps: IComponentProps = {
+  children: null,
+  color: 'indigo',
+  size: 'regular',
+  buttonType: 'solid',
+  disabled: false,
+  onClick: () => new Error('Button onClick not provided'),
+}
+
+const Button: React.FC<IComponentProps> = ({ children, color, size, buttonType, className, disabled, ...rest }) => {
+
+  // Ty 2 constanty bych dal mimo komponentu jako funkci ktera bere color a vraci ten array, 
+  // pak pridal primo dolu do classnames volani te funkce
+  const buttonSolid = [
     'text-white',
     filledBgColors[color],
     filledBgHoverColors[color],
@@ -96,42 +121,26 @@ const Button: React.FC<{
     outlineBgActiveColors[color],
   ];
 
-  const buttonSM = ['py-1.5 px-4', 'text-xs', 'leading-normal'];
-  const buttonRegular = ['py-2.5 px-6', 'text-xs', 'leading-normal'];
-  const buttonLG = ['py-3 px-7', 'text-sm', 'leading-relaxed'];
-
-  if (size === 'sm') {
-    classes.push(...buttonSM);
-  } else if (size === 'lg') {
-    classes.push(...buttonLG);
-  } else {
-    classes.push(...buttonRegular);
-  }
-
-  if (disabled) {
-    classes.push('pointer-events-none bg-gray-200');
-  } else {
-    if (buttonType === 'outline') {
-      classes.push(...buttonOutline);
-    } else {
-      classes.push(...buttonFilled);
-    }
-  }
-
   return (
     <button
       {...rest}
       disabled={disabled}
-      className={clsx({
-        'flex items-center justify-center gap-1 font-bold outline-none tracking-wider focus:outline-none focus:shadow-none transition-all duration-300':
-          true,
-        ...(className && { [className]: true }),
-        [classes.join(' ')]: true,
-      })}
+      className={
+        clsx(
+          initialClasses,
+          buttonSizes[size ?? 'regular'],
+          className ?? '',
+          disabled ? 'pointer-events-none bg-gray-200' : '',
+          ...(buttonType === 'solid' ? buttonSolid : buttonOutline)
+        )
+      }
     >
       {children}
     </button>
   );
 };
+
+
+Button.defaultProps = defaultProps
 
 export default Button;
